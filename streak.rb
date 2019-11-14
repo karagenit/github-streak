@@ -20,7 +20,10 @@ query = %{
   }
 }
 
+# Get contribution calendar from github
 data = Github.query(token, query)
+
+# Grab just the data we care about (date/contrib pairs)
 dates = []
 weeks = data['data']['viewer']['contributionsCollection']['contributionCalendar']['weeks']
 weeks.each do |week|
@@ -28,8 +31,12 @@ weeks.each do |week|
     dates.push day
   end
 end
+
+# Order contribs by date, most recent first
 dates.sort_by! { |h| Date.strptime(h['date'], "%Y-%m-%d") }
 dates.reverse!
+
+# Count consecutive days with contribs > 0
 days = 0
 dates.each do |date|
   if date['contributionCount'] > 0
@@ -38,10 +45,13 @@ dates.each do |date|
     break
   end
 end
-p days
 
+# Set Github status based on streak
 mutation = %{
-  changeUserStatus(input: { message: "Current Streak: #{days} Days", emoji: ":fire:" }) {
-    clientMutationId
+  mutation {
+    changeUserStatus(input: { message: "Current Streak: #{days} Days", emoji: ":fire:" }) {
+      clientMutationId
+    }
   }
 }
+Github.query(token, mutation)
