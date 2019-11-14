@@ -36,20 +36,32 @@ end
 dates.sort_by! { |h| Date.strptime(h['date'], "%Y-%m-%d") }
 dates.reverse!
 
-# Count consecutive days with contribs > 0
-days = 0
+# Count current streak, consecutive days with contribs > 0
+current = 0
 dates.each do |date|
   if date['contributionCount'] > 0
-    days += 1
+    current += 1
   else
     break
   end
 end
 
+# Count best streak
+best = 0
+counter = 0
+dates.each do |date|
+  if date['contributionCount'] > 0
+    counter += 1
+  else
+    counter = 0
+  end
+  best = counter if counter > best
+end
+
 # Set Github status based on streak
 mutation = %{
   mutation {
-    changeUserStatus(input: { message: "Current Streak: #{days} Days", emoji: ":fire:" }) {
+    changeUserStatus(input: { message: "Current: #{current} Days ..... Year-Best: #{best} Days", emoji: ":fire:" }) {
       clientMutationId
     }
   }
