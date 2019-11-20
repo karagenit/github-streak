@@ -36,6 +36,8 @@ end
 dates.sort_by! { |h| Date.strptime(h['date'], "%Y-%m-%d") }
 dates.reverse!
 
+dates.shift if dates[0]['contributionCount'] == 0
+
 # Count current streak, consecutive days with contribs > 0
 current = 0
 dates.each do |date|
