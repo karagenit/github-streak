@@ -36,7 +36,11 @@ end
 dates.sort_by! { |h| Date.strptime(h['date'], "%Y-%m-%d") }
 dates.reverse!
 
+# Skip current day if contribs = 0
 dates.shift if dates[0]['contributionCount'] == 0
+
+today = Date.strptime(dates[0]['date'], "%Y-%m-%d")
+expiration = (today + 1).strftime("%Y-%m-%dT%H:%M:%S%z")
 
 # Count current streak, consecutive days with contribs > 0
 current = 0
@@ -63,7 +67,7 @@ end
 # Set Github status based on streak
 mutation = %{
   mutation {
-    changeUserStatus(input: { message: "Current Streak: #{current} Days (Best: #{best} Days)", emoji: ":fire:" }) {
+    changeUserStatus(input: { message: "Current Streak: #{current} Days (Best: #{best} Days)", emoji: ":fire:", expiresAt: "#{expiration}" }) {
       clientMutationId
     }
   }
