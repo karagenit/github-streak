@@ -61,9 +61,11 @@ end
 # Set Github status based on streak
 mutation = %{
   mutation {
-    changeUserStatus(input: { message: "Current: #{current} Days ..... Year-Best: #{best} Days", emoji: ":fire:" }) {
+    changeUserStatus(input: { message: "Current Streak: #{current} Days (Best: #{best} Days)", emoji: ":fire:" }) {
       clientMutationId
     }
   }
 }
 Github.query(token, mutation)
+
+puts "Current Streak: #{current} Days (Best: #{best} Days)"
